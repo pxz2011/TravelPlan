@@ -1,6 +1,7 @@
 package com.pxzq.travel_plan.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
@@ -10,8 +11,10 @@ import java.time.LocalDateTime;
 @Data
 public class User {
     //id
-    @TableId
+    @TableId(type = IdType.ASSIGN_ID)
     private Long id;
+    //姓名
+    private String name;
     //用户名
     private String userName;
     //密码
