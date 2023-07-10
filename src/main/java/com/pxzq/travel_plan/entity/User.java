@@ -14,6 +14,7 @@ public class User {
     @TableId(type = IdType.ASSIGN_ID)
     private Long id;
     //姓名
+    @TableField(fill = FieldFill.INSERT)
     private String name;
     //用户名
     private String userName;
@@ -23,16 +24,13 @@ public class User {
     private String email;
     //手机号(发送验证码)
     private String phoneNum;
+    @TableField(fill = FieldFill.INSERT)
     //创建时间
     private LocalDateTime createTime;
+    @TableField(fill = FieldFill.UPDATE)
     //修改时间
     private LocalDateTime updateTime;
-    @TableField(fill = FieldFill.INSERT)
     //创建用户
-    private Long createUser;
-    @TableField(fill = FieldFill.INSERT)
-    //修改用户
-    private Long updateUser;
     //用户状态
-    private Integer Status;
+    private Integer status;
 }

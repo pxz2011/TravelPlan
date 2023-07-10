@@ -30,7 +30,7 @@ public class JwtUtil {
     public static String getToken(String userName, String Password) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
-        String Token = JWT.create().withClaim("userName", userName).withClaim("password", Password).withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256("i'amtoken!xlhtk!@#$%^&*()"));
+        String Token = JWT.create().withClaim("userName", userName).withClaim("password", Password).withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256(TOKENKEY));
         log.info("token:{}", Token);
         return Token;
     }
@@ -44,7 +44,6 @@ public class JwtUtil {
             log.info("userName=" + jwt.getClaim("userName").asString());
             String redisToken = (String) redisUtil.get("token_" + jwt.getClaim("userName").asString());
             log.info("redisToken=" + redisToken);
-            System.out.println(redisToken.equals(token));
             return redisToken.equals(token);
         } catch (Exception e) {
             return false;
@@ -58,8 +57,8 @@ public class JwtUtil {
             DecodedJWT verify = jwtVerifier.verify(token);
             String userName = verify.getClaim("userName").asString();
             String password = verify.getClaim("password").asString();
-            System.out.println("userName = " + userName);
-            System.out.println("password = " + password);
+            log.info("userName = " + userName);
+            log.info("password = " + password);
             if (userName == null || password == null) {
                 return null;
             }

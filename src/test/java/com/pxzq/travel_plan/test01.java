@@ -27,12 +27,11 @@ public class test01 {
         user.setEmail("1521955177@qq.com");
         user.setUserName("pxzq");
         user.setName("彭啸洲");
-        user.setPassword(DigestUtils.md5DigestAsHex("laofengwukun8905^".getBytes()));
+        user.setPassword(DigestUtils.md5DigestAsHex("123".getBytes()));
         user.setStatus(1);
         user.setPhoneNum("13161288127");
         user.setUpdateTime(LocalDateTime.now());
-        user.setCreateUser(1L);
-        user.setUpdateUser(1L);
+        user.setId(1L);
         userMapper.insert(user);
     }
 
