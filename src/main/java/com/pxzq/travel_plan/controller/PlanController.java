@@ -29,9 +29,9 @@ public class PlanController {
     private PlanService planService;
 
     @GetMapping("/page")
-    public R<Page<Plan>> page(int pageNum, int pageSize, HttpServletRequest request) {
+    public R<Page<Plan>> page(int pageNum, int pageSize, HttpServletRequest request, String cond) {
         String token = request.getHeader("token");
-        log.info("页码为:{},每页数据为:{},用户token为:{}", pageNum, pageSize, token);
+        log.info("页码为:{},每页数据为:{},用户token为:{},查询条件为:{}", pageNum, pageSize, token, cond);
         //获取token
         Page<Plan> page = new Page<>(pageNum, pageSize);
         try {
@@ -39,9 +39,20 @@ public class PlanController {
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(user != null, User::getUserName, Objects.requireNonNull(user).getUserName());
             User user1 = userService.getOne(queryWrapper);
+            //分页查询
             LambdaQueryWrapper<Plan> planLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            planService.page(page, planLambdaQueryWrapper.eq(Plan::getUserId, user1.getId()));
+            planLambdaQueryWrapper.eq(Plan::getUserId, user1.getId());
+            if (cond != null && !cond.equals("")) {
+                planLambdaQueryWrapper.like(Plan::getPlace, cond).or();
+                planLambdaQueryWrapper.like(Plan::getThing, cond).or();
+                planLambdaQueryWrapper.like(Plan::getTime, cond);
+            }
+            planLambdaQueryWrapper.orderByDesc(Plan::getUpdateTime);
+            planLambdaQueryWrapper.orderByDesc(Plan::getCreateTime);
+            planLambdaQueryWrapper.orderByDesc(Plan::getTime);
+            planService.page(page, planLambdaQueryWrapper);
             return R.success(page);
+
         } catch (Exception e) {
             return R.error("token验证失败!");
         }

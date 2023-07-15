@@ -23,7 +23,7 @@ import java.util.Objects;
 @CrossOrigin
 public class UserController {
     @Autowired
-    RedisUtil redisUtil;
+    private RedisUtil redisUtil;
     @Resource
     private UserService userService;
 
