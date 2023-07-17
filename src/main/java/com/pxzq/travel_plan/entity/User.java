@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class User {
@@ -26,10 +26,10 @@ public class User {
     private String phoneNum;
     @TableField(fill = FieldFill.INSERT)
     //创建时间
-    private LocalDateTime createTime;
+    private Date createTime;
     @TableField(fill = FieldFill.UPDATE)
     //修改时间
-    private LocalDateTime updateTime;
+    private Date updateTime;
     //创建用户
     //用户状态
     private Integer status;

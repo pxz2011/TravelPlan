@@ -11,11 +11,9 @@ import com.pxzq.travel_plan.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.Objects;
 
 @RestController
@@ -36,19 +34,16 @@ public class PlanController {
         Page<Plan> page = new Page<>(pageNum, pageSize);
         try {
             User user = JwtUtil.parse(token);
-            LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(user != null, User::getUserName, Objects.requireNonNull(user).getUserName());
-            User user1 = userService.getOne(queryWrapper);
             //分页查询
             LambdaQueryWrapper<Plan> planLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            planLambdaQueryWrapper.eq(Plan::getUserId, user1.getId());
+            log.info("线程id为:{}", Thread.currentThread().getName());
+            planLambdaQueryWrapper.eq(Plan::getUserId, Objects.requireNonNull(user).getId());
             if (cond != null && !cond.equals("")) {
                 planLambdaQueryWrapper.like(Plan::getPlace, cond).or();
                 planLambdaQueryWrapper.like(Plan::getThing, cond).or();
-                planLambdaQueryWrapper.like(Plan::getTime, cond);
+                planLambdaQueryWrapper.like(Plan::getTime, cond).or();
+                planLambdaQueryWrapper.like(Plan::getRemark, cond);
             }
-            planLambdaQueryWrapper.orderByDesc(Plan::getUpdateTime);
-            planLambdaQueryWrapper.orderByDesc(Plan::getCreateTime);
             planLambdaQueryWrapper.orderByDesc(Plan::getTime);
             planService.page(page, planLambdaQueryWrapper);
             return R.success(page);
@@ -56,5 +51,35 @@ public class PlanController {
         } catch (Exception e) {
             return R.error("token验证失败!");
         }
+    }
+
+    @PutMapping("/save")
+    public R<String> save(@RequestBody Plan plan, HttpServletRequest request) {
+        log.info("数据为:{}", plan);
+        String token = request.getHeader("token");
+        try {
+            User user = JwtUtil.parse(token);
+            plan.setUserId(Objects.requireNonNull(user).getId());
+        } catch (Exception e) {
+            return R.error(e.getMessage());
+        }
+        plan.setUpdateTime(new Date());
+        if (plan.getRemark() == null || plan.getRemark().equals("")) {
+            plan.setRemark("无");
+        }
+        planService.save(plan);
+        return R.success("添加成功!");
+    }
+
+    @DeleteMapping("/{id}")
+    public R<String> del(@PathVariable Long id) {
+        log.info("id为:{}", id);
+        boolean removeById = this.planService.removeById(id);
+        if (removeById) {
+            return R.success("删除成功!");
+        } else {
+            return R.error("删除失败");
+        }
+
     }
 }

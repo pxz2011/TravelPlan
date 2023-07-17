@@ -22,15 +22,20 @@ import java.util.Calendar;
 @Component
 @Slf4j
 public class JwtUtil {
-    private static final String TOKENKEY = "cnm sb nmsl";
+    private static final String TOKENKEY = "cnm sb nmsl,傻逼你妈死了 彭峰摸得卵子";
     static User user = new User();
     static
     RedisUtil redisUtil;
 
-    public static String getToken(String userName, String Password) {
+    public static String getToken(String userName, String Password, Long userId) {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, 1);
-        String Token = JWT.create().withClaim("userName", userName).withClaim("password", Password).withExpiresAt(calendar.getTime()).sign(Algorithm.HMAC256(TOKENKEY));
+        String Token = JWT.create().
+                withClaim("userName", userName).
+                withClaim("password", Password).
+                withClaim("userId", userId).
+                withExpiresAt(calendar.getTime()).
+                sign(Algorithm.HMAC256(TOKENKEY));
         log.info("token:{}", Token);
         return Token;
     }
@@ -57,14 +62,17 @@ public class JwtUtil {
             DecodedJWT verify = jwtVerifier.verify(token);
             String userName = verify.getClaim("userName").asString();
             String password = verify.getClaim("password").asString();
+            Long id = verify.getClaim("userId").asLong();
             log.info("userName = " + userName);
             log.info("password = " + password);
+            log.info("userID = " + id);
             if (userName == null || password == null) {
                 return null;
             }
 
             user.setUserName(userName);
             user.setPassword(password);
+            user.setId(id);
         } catch (TokenExpiredException var5) {
             throw new Exception("token已失效!!,请重新登录!!", var5);
         } catch (JWTDecodeException | SignatureVerificationException var6) {

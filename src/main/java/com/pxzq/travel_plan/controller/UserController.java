@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,7 +52,8 @@ public class UserController {
         User userServiceOne = userService.getOne(queryWrapper);
         //4判断
         if (userServiceOne != null) {
-            String token = JwtUtil.getToken(userName, password);
+            String token = JwtUtil.getToken(userName, password,
+                    userServiceOne.getId());
             //存储token
             redisUtil.set(userName, token, 604800L);
             //返回成功结果
@@ -74,11 +75,15 @@ public class UserController {
         String password = user.getPassword();
         //1判断用户名是否重复
         log.info("用户信息:{}", user);
-        user.setUpdateTime(LocalDateTime.now());
+        user.setUpdateTime(new Date());
         user.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
+        user.setStatus(1);
+        user.setName("user");
         this.userService.save(user);
-        String token = JwtUtil.getToken(userName, user.getPassword());
+        User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
+        String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
         redisUtil.set(userName, token, 604800L);
+        log.info("线程id为:{}", Thread.currentThread().getName());
         return R.success(token);
     }
 
