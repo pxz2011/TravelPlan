@@ -47,14 +47,16 @@ public class JwtUtil {
             log.info("redisToken=" + redisToken);
             log.info("token = {}", token);
             return redisToken.equals(token);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new RuntimeException(e.getMessage());
+        } catch (TokenExpiredException expiredException) {
+            log.error("token过期");
+            throw new RuntimeException("token过期!!!");
+        } catch (JWTDecodeException | SignatureVerificationException exception) {
+            throw new RuntimeException("token错误!!!");
         }
 
     }
 
-    public static User parse(String token) throws Exception {
+    public static User parse(String token) {
         try {
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKENKEY)).build();
             DecodedJWT verify = jwtVerifier.verify(token);
@@ -72,9 +74,9 @@ public class JwtUtil {
             user.setPassword(password);
             user.setId(id);
         } catch (TokenExpiredException var5) {
-            throw new Exception("token已失效!!,请重新登录!!", var5);
+            throw new RuntimeException("token已失效!!,请重新登录!!", var5);
         } catch (JWTDecodeException | SignatureVerificationException var6) {
-            throw new Exception("token错误!", var6);
+            throw new RuntimeException("token错误!", var6);
         }
 
         return user;
