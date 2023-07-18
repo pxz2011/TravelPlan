@@ -14,7 +14,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -23,7 +22,7 @@ import java.util.Objects;
 @CrossOrigin
 public class UserController {
     @Autowired
-    private RedisUtil redisUtil;
+    RedisUtil redisUtil;
     @Resource
     private UserService userService;
 
@@ -55,7 +54,7 @@ public class UserController {
             String token = JwtUtil.getToken(userName, password,
                     userServiceOne.getId());
             //存储token
-            redisUtil.set(userName, token, 604800L);
+            redisUtil.add(userName, token, 604800L);
             //返回成功结果
             return R.success(token);
         }
@@ -82,7 +81,7 @@ public class UserController {
         this.userService.save(user);
         User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
         String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
-        redisUtil.set(userName, token, 604800L);
+        redisUtil.add(userName, token, 604800L);
         log.info("线程id为:{}", Thread.currentThread().getName());
         return R.success(token);
     }
@@ -93,24 +92,6 @@ public class UserController {
      * @param request
      * @return
      */
-    @GetMapping("/list")
-    public R<List<User>> list(HttpServletRequest request) {
-        log.warn("list");
-        String token = request.getHeader("token");
-        log.info("token:{}", token);
-        try {
-            User user = JwtUtil.parse(token);
-            if (Objects.requireNonNull(user).getUserName().equals("admin")) {
-                List<User> list = this.userService.list();
-                return R.success(list);
-            } else {
-                return R.success(this.userService.list(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName())));
-            }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return R.error(e.getMessage());
-        }
-    }
 
     /**
      * logout
@@ -125,7 +106,7 @@ public class UserController {
         log.info("token:{}", token);
         try {
             User parse = JwtUtil.parse(token);
-            redisUtil.del(Objects.requireNonNull(parse).getUserName());
+            redisUtil.delete(Objects.requireNonNull(parse).getUserName());
             return R.success("登出成功!");
         } catch (Exception e) {
             return R.error(e.getMessage());

@@ -14,18 +14,15 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pxzq.travel_plan.entity.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
 
-
-@Component
 @Slf4j
 public class JwtUtil {
     private static final String TOKENKEY = "cnm sb nmsl,傻逼你妈死了 彭峰摸得卵子";
     static User user = new User();
-    static
-    RedisUtil redisUtil;
+
+    static RedisUtil redisUtil = new RedisUtil();
 
     public static String getToken(String userName, String Password, Long userId) {
         Calendar calendar = Calendar.getInstance();
@@ -41,17 +38,18 @@ public class JwtUtil {
     }
 
     public static boolean verify(String token) {
-        System.out.println("验证token" + JWT.require(Algorithm.HMAC256(TOKENKEY)).build().verify(token));
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(TOKENKEY)).build();
         DecodedJWT jwt;
         try {
             jwt = verifier.verify(token);
             log.info("userName=" + jwt.getClaim("userName").asString());
-            String redisToken = (String) redisUtil.get("token_" + jwt.getClaim("userName").asString());
+            String redisToken = String.valueOf(redisUtil.get(jwt.getClaim("userName").asString()));
             log.info("redisToken=" + redisToken);
+            log.info("token = {}", token);
             return redisToken.equals(token);
         } catch (Exception e) {
-            return false;
+            log.error(e.getMessage());
+            throw new RuntimeException(e.getMessage());
         }
 
     }

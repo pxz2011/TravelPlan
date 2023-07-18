@@ -28,4 +28,10 @@ public class GlobalExceptionHandler {
         }
         return R.error("未知错误!");
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public R<String> ex02(RuntimeException runtimeException) {
+        log.error("异常信息为:{}", runtimeException.getMessage());
+        return R.error(runtimeException.getMessage());
+    }
 }
