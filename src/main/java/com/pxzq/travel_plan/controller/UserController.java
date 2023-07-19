@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -56,7 +57,7 @@ public class UserController {
             String token = JwtUtil.getToken(userName, password,
                     userServiceOne.getId());
             //存储token
-            redisUtil.add(userName, token, 604800L);
+            redisUtil.add(userName, token, 604800L, TimeUnit.DAYS);
             //返回成功结果
             return R.success(token);
         }
@@ -83,7 +84,7 @@ public class UserController {
         this.userService.save(user);
         User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
         String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
-        redisUtil.add(userName, token, 604800L);
+        redisUtil.add(userName, token, 604800L, TimeUnit.DAYS);
         log.info("线程id为:{}", Thread.currentThread().getName());
         return R.success(token);
     }
@@ -142,7 +143,7 @@ public class UserController {
             updateWrapper.set(User::getUpdateTime, new Date());
             userService.update(updateWrapper);
             String token1 = JwtUtil.getToken(parse.getUserName(), password, parse.getId());
-            redisUtil.add(parse.getUserName(), token1, 604800L);
+            redisUtil.add(parse.getUserName(), token1, 604800L, TimeUnit.DAYS);
             return R.success(token1);
         }
         return R.error("修改用户信息失败");
