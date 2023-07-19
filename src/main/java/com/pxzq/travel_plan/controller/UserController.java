@@ -1,6 +1,7 @@
 package com.pxzq.travel_plan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.UserService;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
 
@@ -111,6 +113,48 @@ public class UserController {
         } catch (Exception e) {
             return R.error(e.getMessage());
         }
+    }
+
+    /**
+     * 修改密码
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/modifyUserInfo")
+    public R<String> modify(@RequestBody User user, HttpServletRequest request, String oldPassword) {
+        String token = request.getHeader("token");
+        User parse = JwtUtil.parse(token);
+        assert parse != null;
+        Long id = parse.getId();
+
+        log.info("User:{},oldPassword:{}", user, oldPassword);
+        //构造器
+        if (oldPassword == null || parse.getPassword().equals(oldPassword)) {
+            LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(User::getId, id);
+            String password = user.getPassword();
+            String email = user.getEmail();
+            String phoneNum = user.getPhoneNum();
+            updateWrapper.set(password != null, User::getPassword, DigestUtils.md5DigestAsHex(Objects.requireNonNull(password).getBytes(StandardCharsets.UTF_8)));
+            updateWrapper.set(email != null, User::getEmail, email);
+            updateWrapper.set(phoneNum != null, User::getPhoneNum, phoneNum);
+            updateWrapper.set(User::getUpdateTime, new Date());
+            userService.update(updateWrapper);
+            String token1 = JwtUtil.getToken(parse.getUserName(), password, parse.getId());
+            redisUtil.add(parse.getUserName(), token1, 604800L);
+            return R.success(token1);
+        }
+        return R.error("修改用户信息失败");
+
+    }
+
+    @DeleteMapping("/del")
+    public R<String> del(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        User parse = JwtUtil.parse(token);
+        this.userService.delUser(Objects.requireNonNull(parse).getId(), parse.getUserName());
+        return R.success("删除用户成功!");
     }
 
 }

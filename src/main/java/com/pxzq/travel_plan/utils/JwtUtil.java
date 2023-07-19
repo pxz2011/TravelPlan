@@ -69,7 +69,6 @@ public class JwtUtil {
             if (userName == null || password == null) {
                 return null;
             }
-
             user.setUserName(userName);
             user.setPassword(password);
             user.setId(id);
