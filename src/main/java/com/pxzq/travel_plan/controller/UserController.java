@@ -130,15 +130,15 @@ public class UserController {
 
         log.info("User:{},oldPassword:{}", user, oldPassword);
         //构造器
-        if (oldPassword == null || parse.getPassword().equals(oldPassword)) {
+        if (oldPassword == null || user.getPassword().isEmpty() || parse.getPassword().equals(oldPassword)) {
             LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
             updateWrapper.eq(User::getId, id);
             String password = user.getPassword();
             String email = user.getEmail();
             String phoneNum = user.getPhoneNum();
-            updateWrapper.set(password != null, User::getPassword, DigestUtils.md5DigestAsHex(Objects.requireNonNull(password).getBytes(StandardCharsets.UTF_8)));
-            updateWrapper.set(email != null, User::getEmail, email);
-            updateWrapper.set(phoneNum != null, User::getPhoneNum, phoneNum);
+            updateWrapper.set(!password.isEmpty(), User::getPassword, DigestUtils.md5DigestAsHex(Objects.requireNonNull(password).getBytes(StandardCharsets.UTF_8)));
+            updateWrapper.set(!email.isEmpty(), User::getEmail, email);
+            updateWrapper.set(!phoneNum.isEmpty(), User::getPhoneNum, phoneNum);
             updateWrapper.set(User::getUpdateTime, new Date());
             userService.update(updateWrapper);
             String token1 = JwtUtil.getToken(parse.getUserName(), password, parse.getId());
