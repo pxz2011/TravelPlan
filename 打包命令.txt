@@ -1,0 +1,1 @@
+jpackage --type app-image --name spring --input target --main-jar travel_plan-0.0.1-SNAPSHOT.jar --win-console --dest dist
