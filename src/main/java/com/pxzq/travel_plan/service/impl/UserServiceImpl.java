@@ -27,6 +27,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         LambdaQueryWrapper<Plan> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Plan::getUserId, userId);
         planService.remove(queryWrapper);
-        redisUtil.delete(userName);
+        redisUtil.del(userName);
     }
 }

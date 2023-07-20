@@ -6,7 +6,6 @@ import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.Plan;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.PlanService;
-import com.pxzq.travel_plan.service.UserService;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,6 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping("/plan")
 public class PlanController {
-    @Autowired
-    private UserService userService;
     @Autowired
     private PlanService planService;
 

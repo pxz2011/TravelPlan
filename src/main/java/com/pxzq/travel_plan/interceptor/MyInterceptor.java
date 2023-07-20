@@ -4,11 +4,15 @@ import com.pxzq.travel_plan.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 @Slf4j
 public class MyInterceptor implements HandlerInterceptor {
+    @Autowired
+    JwtUtil jwtUtil;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("*"));
@@ -27,7 +31,7 @@ public class MyInterceptor implements HandlerInterceptor {
             return true;
         }
         try {
-            if (null == token || "".equals(token) || !JwtUtil.verify(token)) {
+            if (null == token || "".equals(token) || !jwtUtil.verify(token)) {
                 throw new RuntimeException("token验证失败!");
             }
         } catch (Exception e) {

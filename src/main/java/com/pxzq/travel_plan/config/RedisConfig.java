@@ -3,12 +3,9 @@ package com.pxzq.travel_plan.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.util.Objects;
+import org.springframework.data.redis.serializer.RedisSerializer;
 
 /**
  * Redis对json序列化处理
@@ -43,35 +40,22 @@ public class RedisConfig {
 //        template.afterPropertiesSet();
 //        return template;
 //    }
+
     @Bean
-    public StringRedisTemplate redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        StringRedisTemplate template = new StringRedisTemplate();
-        GenericJackson2JsonRedisSerializerCustomized jackson2JsonRedisSerializer = new GenericJackson2JsonRedisSerializerCustomized();
-        StringRedisSerializer stringRedisSerializer = new StringRedisSerializer();
-        template.setKeySerializer(stringRedisSerializer);
-        template.setValueSerializer(jackson2JsonRedisSerializer);
-        template.setHashKeySerializer(stringRedisSerializer);
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
-        template.setConnectionFactory(redisConnectionFactory);
-        template.afterPropertiesSet();
-        return template;
-    }
-
-    public static class GenericJackson2JsonRedisSerializerCustomized extends GenericJackson2JsonRedisSerializer {
-        @Override
-        public byte[] serialize(Object source) throws SerializationException {
-            if (Objects.nonNull(source)) {
-                if (source instanceof String || source instanceof Character) {
-                    return source.toString().getBytes();
-                }
-            }
-            return super.serialize(source);
-        }
-
-        @Override
-        public <T> T deserialize(byte[] source, Class<T> type) throws SerializationException {
-            return super.deserialize(source, type);
-        }
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
+        //1.创建
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(connectionFactory);
+        //json序列化工具
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer();
+        //设置key的序列化
+        //StringRedisSerializer UTF_8 = new StringRedisSerializer(StandardCharsets.UTF_8);
+        redisTemplate.setKeySerializer(RedisSerializer.string());
+        redisTemplate.setHashKeySerializer(RedisSerializer.string());
+        //设置值的value
+        redisTemplate.setValueSerializer(serializer);
+        redisTemplate.setHashKeySerializer(serializer);
+        return redisTemplate;
     }
 
 }
