@@ -10,9 +10,9 @@ import java.util.Date;
 
 @Slf4j
 @Component
-/**
- * 自动填充的字段处理
- * 字段上方需要添加@TableField注解
+/*
+  自动填充的字段处理
+  字段上方需要添加@TableField注解
  */
 public class MyMetaObjectHandler implements MetaObjectHandler {
 
