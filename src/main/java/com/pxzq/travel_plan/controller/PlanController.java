@@ -12,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @RestController
@@ -33,18 +35,44 @@ public class PlanController {
             User user = JwtUtil.parse(token);
             //分页查询
             LambdaQueryWrapper<Plan> planLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            log.info("线程id为:{}", Thread.currentThread().getName());
-            planLambdaQueryWrapper.eq(Plan::getUserId, Objects.requireNonNull(user).getId());
-            if (cond != null && !cond.equals("")) {
-                planLambdaQueryWrapper.like(Plan::getPlace, cond).or();
-                planLambdaQueryWrapper.like(Plan::getThing, cond).or();
-                planLambdaQueryWrapper.like(Plan::getTime, cond).or();
-                planLambdaQueryWrapper.like(Plan::getRemark, cond);
+//            log.info("线程id为:{}", Thread.currentThread().getName());
+//            planLambdaQueryWrapper.eq(Plan::getUserId, Objects.requireNonNull(user).getId());
+//            if (cond != null && !cond.equals("")) {
+//                planLambdaQueryWrapper.like(Plan::getPlace, cond).or();
+//                planLambdaQueryWrapper.like(Plan::getThing, cond).or();
+//                planLambdaQueryWrapper.like(Plan::getTime, cond).or();
+//                planLambdaQueryWrapper.like(Plan::getRemark, cond);
+//            }
+//            planLambdaQueryWrapper.orderByDesc(Plan::getTime);
+            Page<Plan> res = new Page<>();
+            if (user != null) {
+                planLambdaQueryWrapper.eq(Plan::getUserId, user.getId());
+                //获取该用户所有数据
+                planService.page(page, planLambdaQueryWrapper);
+                //copy
+                List<Plan> list;
+                List<Plan> resList = new ArrayList<>();
+                list = page.getRecords();
+                for (Plan plan : list) {
+                    log.info(String.valueOf(plan));
+                    if (cond != null) {
+                        //模糊查询
+                        if (plan.getRemark().contains(cond) ||
+                                plan.getTime().contains(cond) ||
+                                plan.getPlace().contains(cond) ||
+                                plan.getThing().contains(cond)
+                        ) {
+                            resList.add(plan);
+                        }
+                    } else {
+                        resList.add(plan);
+                    }
+                }
+                log.info("list:{}", resList);
+                res.setRecords(resList);
+                return R.success(res);
             }
-            planLambdaQueryWrapper.orderByDesc(Plan::getTime);
-            planService.page(page, planLambdaQueryWrapper);
-            return R.success(page);
-
+            return R.error("token错误!");
         } catch (Exception e) {
             return R.error("token验证失败!");
         }
