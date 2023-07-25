@@ -47,15 +47,6 @@ public class PlanController {
             User user = JwtUtil.parse(token);
             //分页查询
             LambdaQueryWrapper<Plan> planLambdaQueryWrapper = new LambdaQueryWrapper<>();
-//            log.info("线程id为:{}", Thread.currentThread().getName());
-//            planLambdaQueryWrapper.eq(Plan::getUserId, Objects.requireNonNull(user).getId());
-//            if (cond != null && !cond.equals("")) {
-//                planLambdaQueryWrapper.like(Plan::getPlace, cond).or();
-//                planLambdaQueryWrapper.like(Plan::getThing, cond).or();
-//                planLambdaQueryWrapper.like(Plan::getTime, cond).or();
-//                planLambdaQueryWrapper.like(Plan::getRemark, cond);
-//            }
-//            planLambdaQueryWrapper.orderByDesc(Plan::getTime);
             Page<Plan> res = new Page<>();
             if (user != null) {
                 planLambdaQueryWrapper.eq(Plan::getUserId, user.getId());
@@ -110,7 +101,7 @@ public class PlanController {
             return R.error(e.getMessage());
         }
         plan.setUpdateTime(new Date());
-        if (plan.getRemark() == null || plan.getRemark().equals("")) {
+        if (plan.getRemark() == null || plan.getRemark().isEmpty()) {
             plan.setRemark("无");
         }
         planService.save(plan);
