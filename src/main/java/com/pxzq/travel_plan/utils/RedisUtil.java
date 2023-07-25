@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisUtil {
 
     private static RedisTemplate<String, Object> redisTemplate;
+
     @Autowired
     private RedisTemplate<String, Object> redis;
 
@@ -28,6 +29,23 @@ public class RedisUtil {
     }
 
     /****************** common start ****************/
+
+    public boolean setOrUpdate(String key, Object keyValue, long expireTime) {
+        try {
+            boolean hasKey = this.hasKey(key);
+            if (hasKey) {
+                this.del(key);
+                this.set(key, keyValue, expireTime);
+            } else {
+                this.set(key, keyValue, expireTime);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     /**
      * 指定缓存失效时间
      *
@@ -65,7 +83,7 @@ public class RedisUtil {
      */
     public boolean hasKey(String key) {
         try {
-            return redisTemplate.hasKey(key);
+            return Boolean.TRUE.equals(redisTemplate.hasKey(key));
         } catch (Exception e) {
             e.printStackTrace();
             return false;

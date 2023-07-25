@@ -15,11 +15,13 @@ public class R<T> {
     private T data; //数据
 
     private Map<Object, Object> map = new HashMap<>(); //动态数据
+    private String token;
 
-    public static <T> R<T> success(T object) {
+    public static <T> R<T> success(T object, String token) {
         R<T> r = new R<>();
         r.data = object;
         r.code = 1;
+        r.token = token;
         return r;
     }
 

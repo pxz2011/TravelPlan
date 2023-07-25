@@ -38,6 +38,11 @@ public class GlobalExceptionHandler {
             String message = "该邮箱已使用!";
             return R.error(message);
         }
+        if (ex.getMessage().contains("token") && ex.getMessage().contains("logout")) {
+            log.warn("退出登录,token失效");
+            //直接跳过,如果不人为修改redis,则redis过期时间与token过期时间是一样的,所以redis的key已经自动删除,不再处理
+            return R.success("登出成功!", null);
+        }
         return R.error(ex.getMessage());
     }
 }

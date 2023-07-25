@@ -3,12 +3,14 @@ package com.pxzq.travel_plan.config;
 import com.pxzq.travel_plan.interceptor.MyInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer {
@@ -37,5 +39,22 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
     @Bean
     public MyInterceptor myInterceptor() {
         return new MyInterceptor();
+    }
+
+    @Bean("taskExecutor")
+    public ThreadPoolTaskExecutor taskExecutor() {
+        ThreadPoolTaskExecutor poolTaskExecutor = new ThreadPoolTaskExecutor();
+        poolTaskExecutor.setCorePoolSize(5);
+        poolTaskExecutor.setMaxPoolSize(20);
+        // 设置线程活跃时间（秒）
+        poolTaskExecutor.setKeepAliveSeconds(60);
+        // 设置队列容量
+        poolTaskExecutor.setQueueCapacity(60);
+        //设置TaskDecorator，用于解决父子线程间的数据复用
+        poolTaskExecutor.setTaskDecorator(new ContextTaskDecorator());
+        poolTaskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        // 等待所有任务结束后再关闭线程池
+        poolTaskExecutor.setWaitForTasksToCompleteOnShutdown(true);
+        return poolTaskExecutor;
     }
 }

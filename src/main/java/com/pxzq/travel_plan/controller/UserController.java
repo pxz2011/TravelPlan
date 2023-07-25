@@ -2,6 +2,7 @@ package com.pxzq.travel_plan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.pxzq.travel_plan.common.OauthContext;
 import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.UserService;
@@ -56,9 +57,9 @@ public class UserController {
             String token = JwtUtil.getToken(userName, password,
                     userServiceOne.getId());
             //存储token
-            redisUtil.set(userName, token, 86400);
+            redisUtil.set(userName, token, 604800);
             //返回成功结果
-            return R.success(token);
+            return R.success(null, token);
         }
         return R.error("登录失败!");
     }
@@ -83,9 +84,9 @@ public class UserController {
         this.userService.save(user);
         User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
         String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
-        redisUtil.set(userName, token, 86400);
+        redisUtil.set(userName, token, 604800);
         log.info("线程id为:{}", Thread.currentThread().getName());
-        return R.success(token);
+        return R.success(null, token);
     }
 
     /**
@@ -102,9 +103,9 @@ public class UserController {
         try {
             User parse = JwtUtil.parse(token);
             redisUtil.del(Objects.requireNonNull(parse).getUserName());
-            return R.success("登出成功!");
+            return R.success("登出成功!", null);
         } catch (Exception e) {
-            return R.error(e.getMessage());
+            throw new RuntimeException(e.getMessage() + "logout");
         }
     }
 
@@ -117,7 +118,7 @@ public class UserController {
      */
     @PostMapping("/modifyUserInfo")
     public R<String> modify(@RequestBody User user, HttpServletRequest request, String oldPassword) {
-        String token = request.getHeader("token");
+        String token = OauthContext.get();
         User parse = JwtUtil.parse(token);
         assert parse != null;
         Long id = parse.getId();
@@ -136,8 +137,8 @@ public class UserController {
             updateWrapper.set(User::getUpdateTime, new Date());
             userService.update(updateWrapper);
             String token1 = JwtUtil.getToken(parse.getUserName(), password, parse.getId());
-            redisUtil.set(parse.getUserName(), token1, 86400);
-            return R.success(token1);
+            redisUtil.set(parse.getUserName(), token1, 604800);
+            return R.success(null, token1);
         }
         return R.error("修改用户信息失败");
 
@@ -151,11 +152,11 @@ public class UserController {
      */
     @DeleteMapping("/del")
     public R<String> del(HttpServletRequest request) {
-        String token = request.getHeader("token");
+        String token = OauthContext.get();
         User parse = JwtUtil.parse(token);
         //多表,还要删除当前用户的关联信息
         this.userService.delUser(Objects.requireNonNull(parse).getId(), parse.getUserName());
-        return R.success("删除用户成功!");
+        return R.success("删除用户成功!", null);
     }
 
 }

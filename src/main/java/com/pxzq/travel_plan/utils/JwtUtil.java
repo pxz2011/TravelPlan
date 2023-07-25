@@ -29,7 +29,7 @@ public class JwtUtil {
 
     public static String getToken(String userName, String Password, Long userId) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DATE, 1);
+        calendar.add(Calendar.DATE, 7);
         String Token = JWT.create().
                 withClaim("userName", userName).
                 withClaim("password", Password).
@@ -37,7 +37,34 @@ public class JwtUtil {
                 withExpiresAt(calendar.getTime()).
                 sign(Algorithm.HMAC256(TOKENKEY));
         log.info("token:{}", Token);
+        log.info("过期时间:{}", calendar.getTime());
         return Token;
+    }
+
+    public static User parse(String token) {
+        try {
+            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKENKEY)).build();
+            DecodedJWT verify = jwtVerifier.verify(token);
+            String userName = verify.getClaim("userName").asString();
+            String password = verify.getClaim("password").asString();
+            Long id = verify.getClaim("userId").asLong();
+            log.info("userName = " + userName);
+            log.info("password = " + password);
+            log.info("userID = " + id);
+            if (userName == null || password == null) {
+                return null;
+            }
+
+            user.setUserName(userName);
+            user.setPassword(password);
+            user.setId(id);
+        } catch (TokenExpiredException var5) {
+            throw new RuntimeException("token已失效!!,请重新登录!!", var5);
+        } catch (JWTDecodeException | SignatureVerificationException var6) {
+            throw new RuntimeException("token错误!", var6);
+        }
+
+        return user;
     }
 
     public boolean verify(String token) {
@@ -55,33 +82,9 @@ public class JwtUtil {
             log.error("token过期");
             throw new RuntimeException("token过期!!!");
         } catch (JWTDecodeException | SignatureVerificationException exception) {
+            log.error("token错误");
             throw new RuntimeException("token错误!!!");
         }
 
-    }
-
-    public static User parse(String token) {
-        try {
-            JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(TOKENKEY)).build();
-            DecodedJWT verify = jwtVerifier.verify(token);
-            String userName = verify.getClaim("userName").asString();
-            String password = verify.getClaim("password").asString();
-            Long id = verify.getClaim("userId").asLong();
-            log.info("userName = " + userName);
-            log.info("password = " + password);
-            log.info("userID = " + id);
-            if (userName == null || password == null) {
-                return null;
-            }
-            user.setUserName(userName);
-            user.setPassword(password);
-            user.setId(id);
-        } catch (TokenExpiredException var5) {
-            throw new RuntimeException("token已失效!!,请重新登录!!", var5);
-        } catch (JWTDecodeException | SignatureVerificationException var6) {
-            throw new RuntimeException("token错误!", var6);
-        }
-
-        return user;
     }
 }

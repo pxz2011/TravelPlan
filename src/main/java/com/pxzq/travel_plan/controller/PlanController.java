@@ -2,6 +2,7 @@ package com.pxzq.travel_plan.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.pxzq.travel_plan.common.OauthContext;
 import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.Plan;
 import com.pxzq.travel_plan.entity.User;
@@ -36,7 +37,7 @@ public class PlanController {
      */
     @GetMapping("/page")
     public R<Page<Plan>> page(int pageNum, int pageSize, HttpServletRequest request, String cond) {
-        String token = request.getHeader("token");
+        String token = OauthContext.get();
         log.info("页码为:{},每页数据为:{},用户token为:{},查询条件为:{}", pageNum, pageSize, token, cond);
         //获取token
         Page<Plan> page = new Page<>(pageNum, pageSize);
@@ -81,7 +82,7 @@ public class PlanController {
                 }
                 log.info("list:{}", resList);
                 res.setRecords(resList);
-                return R.success(res);
+                return R.success(res, token);
             }
             return R.error("token错误!");
         } catch (Exception e) {
@@ -92,14 +93,13 @@ public class PlanController {
     /**
      * 保存新计划
      *
-     * @param plan    请求体
-     * @param request 请求头
+     * @param plan 请求体
      * @return 返回是否添加成功
      */
     @PutMapping("/save")
-    public R<String> save(@RequestBody Plan plan, HttpServletRequest request) {
+    public R<String> save(@RequestBody Plan plan) {
         log.info("数据为:{}", plan);
-        String token = request.getHeader("token");
+        String token = OauthContext.get();
         try {
             User user = JwtUtil.parse(token);
             plan.setUserId(Objects.requireNonNull(user).getId());
@@ -111,7 +111,7 @@ public class PlanController {
             plan.setRemark("无");
         }
         planService.save(plan);
-        return R.success("添加成功!");
+        return R.success("添加成功!", token);
     }
 
     /**
@@ -123,9 +123,10 @@ public class PlanController {
     @DeleteMapping("/{id}")
     public R<String> del(@PathVariable Long id) {
         log.info("id为:{}", id);
+        String token = OauthContext.get();
         boolean removeById = this.planService.removeById(id);
         if (removeById) {
-            return R.success("删除成功!");
+            return R.success("删除成功!", token);
         } else {
             return R.error("删除失败");
         }
