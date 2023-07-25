@@ -33,8 +33,8 @@ public class UserController {
      * param1:userName
      * param2:password
      *
-     * @param user
-     * @return
+     * @param user 请求体
+     * @return 返回token
      */
     @PostMapping("/login")
     public R<String> login(@RequestBody User user) {
@@ -66,8 +66,8 @@ public class UserController {
     /**
      * 用户注册
      *
-     * @param user
-     * @return
+     * @param user 请求体
+     * @return 注册成功返回token
      */
     @PostMapping("/reg")
     public R<String> reg(@RequestBody User user) {
@@ -89,17 +89,10 @@ public class UserController {
     }
 
     /**
-     * 列出当前用户信息
-     *
-     * @param request
-     * @return
-     */
-
-    /**
      * logout
      *
-     * @param request
-     * @return
+     * @param request 获取token
+     * @return 返回是否登出成功
      */
     @PostMapping("/logout")
     public R<String> logout(HttpServletRequest request) {
@@ -118,8 +111,9 @@ public class UserController {
     /**
      * 修改密码
      *
-     * @param request
-     * @return
+     * @param request 请求头
+     * @param user    请求体
+     * @return 返回是否修改用户信息成功
      */
     @PostMapping("/modifyUserInfo")
     public R<String> modify(@RequestBody User user, HttpServletRequest request, String oldPassword) {
@@ -149,10 +143,17 @@ public class UserController {
 
     }
 
+    /**
+     * 删除用户
+     *
+     * @param request 请求头
+     * @return 返回是否删除用户成功
+     */
     @DeleteMapping("/del")
     public R<String> del(HttpServletRequest request) {
         String token = request.getHeader("token");
         User parse = JwtUtil.parse(token);
+        //多表,还要删除当前用户的关联信息
         this.userService.delUser(Objects.requireNonNull(parse).getId(), parse.getUserName());
         return R.success("删除用户成功!");
     }

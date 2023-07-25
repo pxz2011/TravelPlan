@@ -25,6 +25,15 @@ public class PlanController {
     @Autowired
     private PlanService planService;
 
+    /**
+     * 分页查询
+     *
+     * @param pageNum  当前页
+     * @param pageSize 每页数量
+     * @param request  请求头
+     * @param cond     查询条件
+     * @return 返回查询数据
+     */
     @GetMapping("/page")
     public R<Page<Plan>> page(int pageNum, int pageSize, HttpServletRequest request, String cond) {
         String token = request.getHeader("token");
@@ -55,16 +64,18 @@ public class PlanController {
                 list = page.getRecords();
                 for (Plan plan : list) {
                     log.info(String.valueOf(plan));
-                    if (cond != null) {
-                        //模糊查询
-                        if (plan.getRemark().contains(cond) ||
-                                plan.getTime().contains(cond) ||
-                                plan.getPlace().contains(cond) ||
-                                plan.getThing().contains(cond)
-                        ) {
-                            resList.add(plan);
-                        }
-                    } else {
+                    //模糊查询
+                    String remark = plan.getRemark().toLowerCase();
+                    String time = plan.getTime().toLowerCase();
+                    String place = plan.getPlace().toLowerCase();
+                    String thing = plan.getThing().toLowerCase();
+                    cond = cond.toLowerCase();
+                    log.info("remark:{},time:{},place:{},thing:{},cond:{}", remark, time, place, thing, cond);
+                    if (remark.contains(cond) ||
+                            time.contains(cond) ||
+                            place.contains(cond) ||
+                            thing.contains(cond)
+                    ) {
                         resList.add(plan);
                     }
                 }
@@ -78,6 +89,13 @@ public class PlanController {
         }
     }
 
+    /**
+     * 保存新计划
+     *
+     * @param plan    请求体
+     * @param request 请求头
+     * @return 返回是否添加成功
+     */
     @PutMapping("/save")
     public R<String> save(@RequestBody Plan plan, HttpServletRequest request) {
         log.info("数据为:{}", plan);
@@ -96,6 +114,12 @@ public class PlanController {
         return R.success("添加成功!");
     }
 
+    /**
+     * 删除一条信息(根据id删除)
+     *
+     * @param id 请求体
+     * @return 返回是否删除成功
+     */
     @DeleteMapping("/{id}")
     public R<String> del(@PathVariable Long id) {
         log.info("id为:{}", id);

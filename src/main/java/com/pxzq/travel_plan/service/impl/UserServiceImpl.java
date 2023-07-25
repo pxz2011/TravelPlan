@@ -22,6 +22,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public void delUser(Long userId, String userName) {
         //多表删除
+        //删除用户
         this.removeById(userId);
         //删除关联信息
         LambdaQueryWrapper<Plan> queryWrapper = new LambdaQueryWrapper<>();
