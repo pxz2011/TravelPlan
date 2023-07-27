@@ -59,6 +59,7 @@ public class PlanController {
             Page<Plan> res = new Page<>();
             if (user != null) {
                 planLambdaQueryWrapper.eq(Plan::getUserId, user.getId());
+                planLambdaQueryWrapper.orderByDesc(Plan::getTime);
                 //获取该用户所有数据
                 planService.page(page, planLambdaQueryWrapper);
                 //copy

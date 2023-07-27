@@ -8,10 +8,9 @@ package com.pxzq.travel_plan.config;
  */
 
 import com.pxzq.travel_plan.common.OauthContext;
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
-
+import org.springframework.lang.NonNull;
 @Slf4j
 public class ContextTaskDecorator implements TaskDecorator {
     @Override
