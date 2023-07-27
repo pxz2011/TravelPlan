@@ -23,18 +23,13 @@ public class MyInterceptor implements HandlerInterceptor {
     RedisUtil redisUtil;
 
     private void returnJson(HttpServletResponse response, String json) {
-        PrintWriter writer = null;
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        try {
-            writer = response.getWriter();
+        try (PrintWriter writer = response.getWriter()) {
             writer.print(json);
 
         } catch (IOException e) {
             System.out.println(e.getMessage());
-        } finally {
-            if (writer != null)
-                writer.close();
         }
     }
 

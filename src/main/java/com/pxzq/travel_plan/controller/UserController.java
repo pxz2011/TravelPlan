@@ -11,7 +11,6 @@ import com.pxzq.travel_plan.utils.RedisUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,10 +23,14 @@ import java.util.Objects;
 @Slf4j
 @CrossOrigin
 public class UserController {
-    @Autowired
+    final
     RedisUtil redisUtil;
     @Resource
     private UserService userService;
+
+    public UserController(RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
+    }
 
     /**
      * 用户登录

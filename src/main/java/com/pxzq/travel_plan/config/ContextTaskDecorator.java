@@ -1,24 +1,22 @@
 package com.pxzq.travel_plan.config;
-
-/**
- * @author pxz
+/*
+  @author pxz
  * @version 1.0
  * @project travel_plan
- * @description
+ * @description 上下文装饰器
  * @date 2023/7/25 14:18:28
  */
 
 import com.pxzq.travel_plan.common.OauthContext;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
 
-/**
- * @description 上下文装饰器
- */
 @Slf4j
 public class ContextTaskDecorator implements TaskDecorator {
     @Override
-    public Runnable decorate(Runnable runnable) {
+    @NonNull
+    public Runnable decorate(@NonNull Runnable runnable) {
         //获取父线程的loginVal
         String token = OauthContext.get();
         return () -> {

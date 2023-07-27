@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public R<String> ex02(RuntimeException ex) {
-        log.error("异常信息为:{}", ex.getMessage());
+        log.error("运行异常信息为:{}", ex.getMessage());
         if (ex.getMessage().contains("Duplicate entry") && ex.getMessage().contains("username")) {
             String message = "该用户已存在!";
             return R.error(message);
@@ -45,4 +45,11 @@ public class GlobalExceptionHandler {
         }
         return R.error(ex.getMessage());
     }
+
+    @ExceptionHandler(NullPointerException.class)
+    public R<String> ex03(NullPointerException ex) {
+        log.error("空指针异常,异常信息为:{},", ex.getMessage());
+        return R.error("空指针异常!,异常信息为:" + ex.getMessage());
+    }
+
 }

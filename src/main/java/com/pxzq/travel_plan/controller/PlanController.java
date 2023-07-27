@@ -10,7 +10,6 @@ import com.pxzq.travel_plan.service.PlanService;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -23,8 +22,11 @@ import java.util.Objects;
 @CrossOrigin
 @RequestMapping("/plan")
 public class PlanController {
-    @Autowired
-    private PlanService planService;
+    private final PlanService planService;
+
+    public PlanController(PlanService planService) {
+        this.planService = planService;
+    }
 
     /**
      * 分页查询

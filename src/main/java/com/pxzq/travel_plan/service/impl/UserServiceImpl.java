@@ -9,15 +9,17 @@ import com.pxzq.travel_plan.service.PlanService;
 import com.pxzq.travel_plan.service.UserService;
 import com.pxzq.travel_plan.utils.RedisUtil;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
     @Resource
     RedisUtil redisUtil;
-    @Autowired
-    private PlanService planService;
+    private final PlanService planService;
+
+    public UserServiceImpl(PlanService planService) {
+        this.planService = planService;
+    }
 
     @Override
     public void delUser(Long userId, String userName) {

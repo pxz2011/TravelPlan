@@ -14,7 +14,6 @@ import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.pxzq.travel_plan.entity.User;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Calendar;
@@ -24,8 +23,12 @@ import java.util.Calendar;
 public class JwtUtil {
     private static final String TOKENKEY = "cnm sb nmsl,傻逼你妈死了 彭峰摸得卵子";
     static User user = new User();
-    @Autowired
+    final
     RedisUtil redisUtil;
+
+    public JwtUtil(RedisUtil redisUtil) {
+        this.redisUtil = redisUtil;
+    }
 
     public static String getToken(String userName, String Password, Long userId) {
         Calendar calendar = Calendar.getInstance();

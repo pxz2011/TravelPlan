@@ -1,0 +1,11 @@
+qodana:
+  only:
+    - master
+    - merge_requests
+  image:
+    name: jetbrains/qodana-jvm
+    entrypoint: [ "" ]
+  variables:
+    QODANA_TOKEN: eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJvcmdhbml6YXRpb24iOiJBbFlxdiIsInByb2plY3QiOiIzQktCZCIsInRva2VuIjoiQUxaMWIifQ.0m8kTJFeKWgJM3wHc4CVaiUC1V4ZjfSUkNnhVYQXa-E
+  script:
+    - qodana --save-report --results-dir=$CI_PROJECT_DIR/.qodana
