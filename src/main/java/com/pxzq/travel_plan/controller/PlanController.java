@@ -8,7 +8,6 @@ import com.pxzq.travel_plan.entity.Plan;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.PlanService;
 import com.pxzq.travel_plan.utils.JwtUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +32,11 @@ public class PlanController {
      *
      * @param pageNum  当前页
      * @param pageSize 每页数量
-     * @param request  请求头
      * @param cond     查询条件
      * @return 返回查询数据
      */
     @GetMapping("/page")
-    public R<Page<Plan>> page(int pageNum, int pageSize, HttpServletRequest request, String cond) {
+    public R<Page<Plan>> page(int pageNum, int pageSize, String cond) {
         String token = OauthContext.get();
         log.info("页码为:{},每页数据为:{},用户token为:{},查询条件为:{}", pageNum, pageSize, token, cond);
         //获取token

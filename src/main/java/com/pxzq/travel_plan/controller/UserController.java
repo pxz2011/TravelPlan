@@ -55,7 +55,7 @@ public class UserController {
         queryWrapper.eq(User::getStatus, "1");
         //3.查询
         User userServiceOne = userService.getOne(queryWrapper);
-        //4判断
+        //4.判断
         if (userServiceOne != null) {
             String token = JwtUtil.getToken(userName, password,
                     userServiceOne.getId());
@@ -115,12 +115,11 @@ public class UserController {
     /**
      * 修改密码
      *
-     * @param request 请求头
      * @param user    请求体
      * @return 返回是否修改用户信息成功
      */
     @PostMapping("/modifyUserInfo")
-    public R<String> modify(@RequestBody User user, HttpServletRequest request, String oldPassword) {
+    public R<String> modify(@RequestBody User user, String oldPassword) {
         String token = OauthContext.get();
         User parse = JwtUtil.parse(token);
         assert parse != null;
@@ -150,11 +149,10 @@ public class UserController {
     /**
      * 删除用户
      *
-     * @param request 请求头
      * @return 返回是否删除用户成功
      */
     @DeleteMapping("/del")
-    public R<String> del(HttpServletRequest request) {
+    public R<String> del() {
         String token = OauthContext.get();
         User parse = JwtUtil.parse(token);
         //多表,还要删除当前用户的关联信息

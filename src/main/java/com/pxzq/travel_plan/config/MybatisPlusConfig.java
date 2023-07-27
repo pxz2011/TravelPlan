@@ -13,7 +13,7 @@ public class MybatisPlusConfig {
     /**
      * 新增分页拦截器，并设置数据库类型为mysql
      *
-     * @return
+     * @return 分页拦截器对象
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
