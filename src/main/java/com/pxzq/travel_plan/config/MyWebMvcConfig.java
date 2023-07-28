@@ -14,6 +14,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer {
+
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
