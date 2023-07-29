@@ -6,6 +6,9 @@ package com.pxzq.travel_plan.config;
  * @description 上下文装饰器
  * @date 2023/7/25 14:18:28
  */
+/*
+  异步线程设置
+ */
 
 import com.pxzq.travel_plan.common.OauthContext;
 import lombok.extern.slf4j.Slf4j;

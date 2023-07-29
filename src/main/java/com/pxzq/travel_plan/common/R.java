@@ -17,6 +17,13 @@ public class R<T> {
     private Map<Object, Object> map = new HashMap<>(); //动态数据
     private String token;
 
+    /**
+     * 成功
+     *
+     * @param object 信息
+     * @param token  jwt
+     * @return 返回一个R对象
+     */
     public static <T> R<T> success(T object, String token) {
         R<T> r = new R<>();
         r.data = object;
@@ -25,6 +32,12 @@ public class R<T> {
         return r;
     }
 
+    /**
+     * 错误
+     *
+     * @param msg 信息
+     * @return 返回R对象
+     */
     public static <T> R<T> error(String msg) {
         R<T> r = new R<>();
         r.msg = msg;

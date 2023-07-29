@@ -6,6 +6,7 @@ import com.pxzq.travel_plan.utils.JwtUtil;
 import com.pxzq.travel_plan.utils.RedisUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 @Slf4j
+//请求拦截器
 public class MyInterceptor implements HandlerInterceptor {
     @Autowired
     JwtUtil jwtUtil;
@@ -36,14 +38,13 @@ public class MyInterceptor implements HandlerInterceptor {
     /**
      * 拦截器
      *
-     * @param request
-     * @param response
-     * @param handler
-     * @return
-     * @throws Exception
+     * @param request 请求头
+     * @param response 响应体
+     * @param handler 处理
+     * @return 是否通行
      */
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler) {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("*"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("P3P", "CP=CAO PSA OUR");
@@ -62,7 +63,7 @@ public class MyInterceptor implements HandlerInterceptor {
         try {
             //判断token
             //验证失败
-            if (null == token || "".equals(token) || !jwtUtil.verify(token)) {
+            if (null == token || token.isEmpty() || !jwtUtil.verify(token)) {
                 throw new RuntimeException("token验证失败!");
             }
             //验证成功
@@ -71,8 +72,6 @@ public class MyInterceptor implements HandlerInterceptor {
                 if (parse != null) {
                     String s = JwtUtil.getToken(parse.getUserName(), parse.getPassword(), parse.getId());
                     redisUtil.setOrUpdate(parse.getUserName(), s, 604800);
-//                    String json = JSONObject.toJSONString(R.success(s));
-//                    returnJson(response,json);
                     OauthContext.set(s);
                     return true;
                 }

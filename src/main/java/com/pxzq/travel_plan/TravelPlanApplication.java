@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @Slf4j
 @SpringBootApplication
+//启动程序
 public class TravelPlanApplication {
 
     public static void main(String[] args) {

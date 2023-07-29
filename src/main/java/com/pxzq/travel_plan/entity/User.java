@@ -25,13 +25,12 @@ public class User implements Serializable {
     private String email;
     //手机号(发送验证码)
     private String phoneNum;
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)//自动插入
     //创建时间
     private Date createTime;
     @TableField(fill = FieldFill.UPDATE)
     //修改时间
     private Date updateTime;
-    //创建用户
-    //用户状态
+    //用户状态(默认为1)
     private Integer status;
 }

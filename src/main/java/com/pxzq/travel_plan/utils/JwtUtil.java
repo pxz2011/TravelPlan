@@ -20,6 +20,9 @@ import java.util.Calendar;
 
 @Slf4j
 @Component
+/**
+ * jwt 工具包
+ */
 public class JwtUtil {
     private static final String TOKENKEY = "cnm sb nmsl,傻逼你妈死了 彭峰摸得卵子";
     static User user = new User();

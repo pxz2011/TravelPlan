@@ -10,7 +10,16 @@ import java.sql.SQLIntegrityConstraintViolationException;
 @RestControllerAdvice
 @ResponseBody
 @Slf4j
+/*
+    异常处理
+ */
 public class GlobalExceptionHandler {
+    /**
+     * sql 异常
+     *
+     * @param ex 异常
+     * @return 错误信息
+     */
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public R<String> ex01(SQLIntegrityConstraintViolationException ex) {
         //获取异常信息
@@ -27,6 +36,11 @@ public class GlobalExceptionHandler {
         return R.error("未知错误!");
     }
 
+    /**
+     * 运行异常
+     * @param ex 异常
+     * @return 异常信息
+     */
     @ExceptionHandler(RuntimeException.class)
     public R<String> ex02(RuntimeException ex) {
         log.error("运行异常信息为:{}", ex.getMessage());
@@ -46,6 +60,11 @@ public class GlobalExceptionHandler {
         return R.error(ex.getMessage());
     }
 
+    /**
+     * 空指针
+     * @param ex 异常
+     * @return 异常信息
+     */
     @ExceptionHandler(NullPointerException.class)
     public R<String> ex03(NullPointerException ex) {
         log.error("空指针异常,异常信息为:{},", ex.getMessage());

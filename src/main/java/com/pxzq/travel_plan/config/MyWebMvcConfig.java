@@ -14,7 +14,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
 public class MyWebMvcConfig implements WebMvcConfigurer {
-
+    /**
+     * 跨域请求处理器
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
@@ -25,6 +27,11 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
 
     }
 
+    /**
+     * 设置拦截器
+     *
+     * @param registry 注册
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         List<String> list = new ArrayList<>();

@@ -12,9 +12,12 @@ import org.springframework.data.redis.serializer.RedisSerializer;
  */
 @Configuration
 public class RedisConfig {
-
-
-
+    /**
+     * redis 序列化
+     *
+     * @param connectionFactory 连接工厂
+     * @return 返回
+     */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {
         //1.创建
