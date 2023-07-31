@@ -24,7 +24,6 @@ public class OauthContext {
      * @return token
      */
     public static String get() {
-        log.info("LocalThreadToken:{}", tokenThreadLocal.get());
         return tokenThreadLocal.get();
     }
 
@@ -34,7 +33,6 @@ public class OauthContext {
      * @param token token
      */
     public static void set(String token) {
-        log.info("setToken,token={}", token);
         tokenThreadLocal.set(token);
     }
 

@@ -1,6 +1,5 @@
 package com.pxzq.travel_plan.utils;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -18,15 +17,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtil {
 
-    private static RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private RedisTemplate<String, Object> redis;
+    private RedisTemplate<String, Object> redisTemplate;
 
-    @PostConstruct
-    public void getRedisTemplate() {
-        redisTemplate = redis;
-    }
 
     /****************** common start ****************/
 

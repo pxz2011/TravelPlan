@@ -7,6 +7,7 @@ import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.Plan;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.PlanService;
+import com.pxzq.travel_plan.service.exception.UnknownException;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -38,7 +39,7 @@ public class PlanController {
     @GetMapping("/page")
     public R<Page<Plan>> page(int pageNum, int pageSize, String cond) {
         String token = OauthContext.get();
-        log.info("页码为:{},每页数据为:{},用户token为:{},查询条件为:{}", pageNum, pageSize, token, cond);
+        log.info("页码为:{},每页数据为:{},查询条件为:{}", pageNum, pageSize, cond);
         //获取token
         Page<Plan> page = new Page<>(pageNum, pageSize);
         try {
@@ -56,14 +57,12 @@ public class PlanController {
                 List<Plan> resList = new ArrayList<>();
                 list = page.getRecords();
                 for (Plan plan : list) {
-                    log.info(String.valueOf(plan));
                     //模糊查询
                     String remark = plan.getRemark().toLowerCase();
                     String time = plan.getTime().toLowerCase();
                     String place = plan.getPlace().toLowerCase();
                     String thing = plan.getThing().toLowerCase();
                     cond = cond.toLowerCase();
-                    log.info("remark:{},time:{},place:{},thing:{},cond:{}", remark, time, place, thing, cond);
                     if (remark.contains(cond) ||
                             time.contains(cond) ||
                             place.contains(cond) ||
@@ -72,13 +71,12 @@ public class PlanController {
                         resList.add(plan);
                     }
                 }
-                log.info("list:{}", resList);
                 res.setRecords(resList);
                 return R.success(res, token);
             }
-            return R.error("token错误!");
-        } catch (Exception e) {
-            return R.error("token验证失败!");
+            return R.error("查询失败!");
+        } catch (Exception ex) {
+            throw new UnknownException(ex.getMessage());
         }
     }
 
@@ -96,7 +94,7 @@ public class PlanController {
             User user = JwtUtil.parse(token);
             plan.setUserId(Objects.requireNonNull(user).getId());
         } catch (Exception e) {
-            return R.error(e.getMessage());
+            throw new UnknownException(e.getMessage());
         }
         plan.setUpdateTime(new Date());
         if (plan.getRemark() == null || plan.getRemark().isEmpty()) {

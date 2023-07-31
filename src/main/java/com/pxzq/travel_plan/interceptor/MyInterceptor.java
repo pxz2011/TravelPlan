@@ -2,20 +2,17 @@ package com.pxzq.travel_plan.interceptor;
 
 import com.pxzq.travel_plan.common.OauthContext;
 import com.pxzq.travel_plan.entity.User;
+import com.pxzq.travel_plan.service.exception.TokenException;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import com.pxzq.travel_plan.utils.RedisUtil;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-@Slf4j
 //请求拦截器
 public class MyInterceptor implements HandlerInterceptor {
     @Autowired
@@ -24,16 +21,6 @@ public class MyInterceptor implements HandlerInterceptor {
     @Autowired
     RedisUtil redisUtil;
 
-    private void returnJson(HttpServletResponse response, String json) {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType("application/json");
-        try (PrintWriter writer = response.getWriter()) {
-            writer.print(json);
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-    }
 
     /**
      * 拦截器
@@ -43,8 +30,9 @@ public class MyInterceptor implements HandlerInterceptor {
      * @param handler 处理
      * @return 是否通行
      */
+
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler) {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler) throws Exception {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("*"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("P3P", "CP=CAO PSA OUR");
@@ -54,7 +42,6 @@ public class MyInterceptor implements HandlerInterceptor {
             response.addHeader("Access-Control-Max-Age", "120");
         }
         //校验登录
-        log.info("requestURI:{}", request.getRequestURI());
         //设置不需拦截路径
         String token = request.getHeader("token");
         if (!(handler instanceof HandlerMethod)) {
@@ -78,8 +65,7 @@ public class MyInterceptor implements HandlerInterceptor {
                 return false;
             }
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new TokenException(e.getMessage());
         }
     }
-
 }

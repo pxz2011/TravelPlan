@@ -8,12 +8,12 @@ import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.UserService;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import com.pxzq.travel_plan.utils.RedisUtil;
-import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
@@ -23,14 +23,11 @@ import java.util.Objects;
 @Slf4j
 @CrossOrigin
 public class UserController {
-    final
+    @Autowired
     RedisUtil redisUtil;
-    @Resource
+    @Autowired
     private UserService userService;
 
-    public UserController(RedisUtil redisUtil) {
-        this.redisUtil = redisUtil;
-    }
 
     /**
      * 用户登录
@@ -88,7 +85,6 @@ public class UserController {
         User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
         String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
         redisUtil.set(userName, token, 604800);
-        log.info("线程id为:{}", Thread.currentThread().getName());
         return R.success(null, token);
     }
 
@@ -102,7 +98,6 @@ public class UserController {
     public R<String> logout(HttpServletRequest request) {
         log.warn("logout");
         String token = request.getHeader("token");
-        log.info("token:{}", token);
         try {
             User parse = JwtUtil.parse(token);
             redisUtil.del(Objects.requireNonNull(parse).getUserName());
@@ -124,8 +119,6 @@ public class UserController {
         User parse = JwtUtil.parse(token);
         assert parse != null;
         Long id = parse.getId();
-
-        log.info("User:{},oldPassword:{}", user, oldPassword);
         //构造器
         if (oldPassword == null || user.getPassword().isEmpty() || parse.getPassword().equals(oldPassword)) {
             LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();

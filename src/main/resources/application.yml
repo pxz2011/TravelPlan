@@ -1,6 +1,10 @@
 server:
   port: 8080
+
 spring:
+  jmx:
+    enabled: true
+
   output:
     ansi:
       enabled: always
@@ -11,16 +15,22 @@ spring:
     username: root
     password: 110105
     driver-class-name: com.mysql.cj.jdbc.Driver
-  data:
-    redis:
-      port: 6379
-      jedis:
-        pool:
-          max-active: 8
-          max-wait: -1
-          max-idle: 10
-          min-idle: 2
-      connect-timeout: 6000
+  #    redis:
+  #
+  #      jedis:
+  #        pool:
+  #          max-active: 8
+  #          max-wait: -1
+  #          max-idle: 10
+  #          min-idle: 2
+  #      connect-timeout: 6000
+  redis:
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 2
 mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
