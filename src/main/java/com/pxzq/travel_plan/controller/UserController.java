@@ -6,6 +6,8 @@ import com.pxzq.travel_plan.common.OauthContext;
 import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.UserService;
+import com.pxzq.travel_plan.utils.CodeUtil;
+import com.pxzq.travel_plan.utils.EmailUtil;
 import com.pxzq.travel_plan.utils.JwtUtil;
 import com.pxzq.travel_plan.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +29,8 @@ public class UserController {
     RedisUtil redisUtil;
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private EmailUtil emailUtil;
 
     /**
      * 用户登录
@@ -108,9 +111,28 @@ public class UserController {
     }
 
     /**
+     * 邮箱登录
+     *
+     * @param emailAddress 邮箱地址
+     * @return Res
+     */
+    @PostMapping("/mail")
+    public R<String> mailLogin(String emailAddress) {
+        //判断数据库是否有邮箱信息
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(!emailAddress.isEmpty(), User::getEmail, emailAddress);
+        User user = userService.getOne(lambdaQueryWrapper);
+        if (user == null) {
+            return R.error("该邮箱未被注册");
+        }
+        emailUtil.sendMessage(emailAddress, "邮箱验证", "您的验证码为:" + CodeUtil.get());
+        return R.success("邮件发送成功!", null);
+    }
+
+    /**
      * 修改密码
      *
-     * @param user    请求体
+     * @param user 请求体
      * @return 返回是否修改用户信息成功
      */
     @PostMapping("/modifyUserInfo")

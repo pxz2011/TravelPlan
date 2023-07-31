@@ -38,6 +38,7 @@ public class MyWebMvcConfig implements WebMvcConfigurer {
         list.add("/user/login");
         list.add("/user/reg");
         list.add("/user/logout");
+        list.add("/user/mail");
         list.add("/error");
         registry.addInterceptor(myInterceptor())
                 .excludePathPatterns(list)
