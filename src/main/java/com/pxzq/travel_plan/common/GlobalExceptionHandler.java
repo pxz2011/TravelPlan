@@ -2,6 +2,7 @@ package com.pxzq.travel_plan.common;
 
 import com.pxzq.travel_plan.service.exception.TokenException;
 import com.pxzq.travel_plan.service.exception.UnknownException;
+import com.pxzq.travel_plan.service.exception.ValidateException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,14 +26,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
     public R<String> ex01(SQLIntegrityConstraintViolationException ex) {
+        String exMessage = ex.getMessage();
         print(ex, "SQL异常");
         //添加用户重复
-        if (ex.getMessage().contains("Duplicate entry") && ex.getMessage().contains("username")) {
-            String message = "该用户已存在";
+        if (exMessage.contains("Duplicate entry") && exMessage.contains("username")) {
+            String[] s = exMessage.split(" ");
+            String message = "该用户:" + s[2] + "已存在";
             return R.error(message);
         }
-        if (ex.getMessage().contains("Duplicate entry") && ex.getMessage().contains("email")) {
-            String message = "该邮箱已使用";
+        if (exMessage.contains("Duplicate entry") && exMessage.contains("email")) {
+            String[] s = exMessage.split(" ");
+            String message = "该邮箱:" + s[2] + "已使用";
+            return R.error(message);
+        }
+        if (exMessage.contains("Duplicate entry") && ex.getMessage().contains("phone_num")) {
+            String[] s = exMessage.split(" ");
+            String message = "该手机号" + s[2] + "已使用";
             return R.error(message);
         }
         return R.error("未知错误");
@@ -74,15 +83,38 @@ public class GlobalExceptionHandler {
         return R.error(ex.getMessage());
     }
 
+    /**
+     * 邮箱发送失败
+     *
+     * @param ex 异常
+     * @return 异常信息
+     */
+
     @ExceptionHandler(MailException.class)
     public R<String> ex06(MailException ex) {
         print(ex, "邮件发送异常!");
         return R.error(ex.getMessage());
     }
 
+    /**
+     * 正则表达式匹配失败
+     *
+     * @param ex 异常
+     * @return 异常信息
+     */
+    @ExceptionHandler(ValidateException.class)
+    public R<String> ex07(ValidateException ex) {
+        print(ex, "正则表达式匹配失败!");
+        return R.error(ex.getMessage());
+    }
+
+    /**
+     * 打印错误信息
+     *
+     * @param ex     异常
+     * @param exName 异常名
+     */
     private void print(Exception ex, String exName) {
-        ex.printStackTrace();
-        String exMessage = ex.getMessage();
-        log.error(exName + "异常信息为:{}", exMessage);
+        log.error(String.valueOf(ex));
     }
 }

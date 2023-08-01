@@ -6,6 +6,7 @@ import com.pxzq.travel_plan.common.OauthContext;
 import com.pxzq.travel_plan.common.R;
 import com.pxzq.travel_plan.entity.User;
 import com.pxzq.travel_plan.service.UserService;
+import com.pxzq.travel_plan.service.exception.ValidateException;
 import com.pxzq.travel_plan.utils.CodeUtil;
 import com.pxzq.travel_plan.utils.EmailUtil;
 import com.pxzq.travel_plan.utils.JwtUtil;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/user")
@@ -84,13 +86,18 @@ public class UserController {
         user.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
         user.setStatus(1);
         user.setName("user");
+        if (!Pattern.matches("^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(.[a-zA-Z0-9_-]+)+$", user.getEmail())) {
+            throw new ValidateException("邮箱格式错误");
+        }
+        if (!Pattern.matches("((\\d{11})|^((\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})|(\\d{4}|\\d{3})-(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1})|(\\d{7,8})-(\\d{4}|\\d{3}|\\d{2}|\\d{1}))$)", user.getPhoneNum())) {
+            throw new ValidateException("手机号格式错误");
+        }
         this.userService.save(user);
         User one = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getUserName, user.getUserName()));
         String token = JwtUtil.getToken(userName, user.getPassword(), one.getId());
         redisUtil.set(userName, token, 604800);
-        return R.success(null, token);
+        return R.success("注册成功!", token);
     }
-
     /**
      * logout
      *
@@ -111,13 +118,13 @@ public class UserController {
     }
 
     /**
-     * 邮箱登录
+     * 邮件发送
      *
      * @param emailAddress 邮箱地址
      * @return Res
      */
-    @PostMapping("/mail")
-    public R<String> mailLogin(String emailAddress) {
+    @PostMapping("/sendEmail")
+    public R<String> sendEmail(String emailAddress) {
         //判断数据库是否有邮箱信息
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.eq(!emailAddress.isEmpty(), User::getEmail, emailAddress);
@@ -125,7 +132,9 @@ public class UserController {
         if (user == null) {
             return R.error("该邮箱未被注册");
         }
-        emailUtil.sendMessage(emailAddress, "邮箱验证", "您的验证码为:" + CodeUtil.get());
+        String code = CodeUtil.get();
+        emailUtil.sendMessage(emailAddress, "邮箱验证", "您的验证码为:" + code + "   一分钟内有效!");
+        redisUtil.set("code_" + emailAddress, code, 60);
         return R.success("邮件发送成功!", null);
     }
 
@@ -173,6 +182,24 @@ public class UserController {
         //多表,还要删除当前用户的关联信息
         this.userService.delUser(Objects.requireNonNull(parse).getId(), parse.getUserName());
         return R.success("删除用户成功!", null);
+    }
+
+    /**
+     * 验证码校验
+     *
+     * @param code         验证码
+     * @param emailAddress 邮箱地址
+     * @return 验证结果
+     */
+    @PostMapping("/verifyCode")
+    public R<String> verifyCode(String code, String emailAddress) {
+        if (redisUtil.get("code_" + emailAddress).equals(code)) {
+            User user = userService.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, emailAddress));
+            String token = JwtUtil.getToken(user.getUserName(), user.getPassword(), user.getId());
+            redisUtil.set(user.getUserName(), token, 604800);
+            return R.success("登录成功!", token);
+        }
+        return R.error("验证失败!");
     }
 
 }

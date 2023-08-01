@@ -2,6 +2,7 @@ package com.pxzq.travel_plan.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -19,6 +20,7 @@ public class RedisUtil {
 
 
     @Autowired
+    @NonNull
     private RedisTemplate<String, Object> redisTemplate;
 
 
@@ -35,7 +37,7 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -54,7 +56,7 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -65,6 +67,7 @@ public class RedisUtil {
      * @param key 键 不能为null
      * @return 时间(秒) 返回0代表为永久有效
      */
+
     public long getExpire(String key) {
         return redisTemplate.getExpire(key, TimeUnit.SECONDS);
     }
@@ -79,7 +82,7 @@ public class RedisUtil {
         try {
             return Boolean.TRUE.equals(redisTemplate.hasKey(key));
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -126,7 +129,7 @@ public class RedisUtil {
             redisTemplate.opsForValue().set(key, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -148,7 +151,7 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -218,7 +221,7 @@ public class RedisUtil {
             redisTemplate.opsForHash().putAll(key, map);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -239,7 +242,7 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -257,7 +260,7 @@ public class RedisUtil {
             redisTemplate.opsForHash().put(key, item, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -279,7 +282,7 @@ public class RedisUtil {
             }
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -345,7 +348,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().members(key);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return null;
         }
     }
@@ -361,7 +364,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().isMember(key, value);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -378,7 +381,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().add(key, values);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
@@ -398,7 +401,7 @@ public class RedisUtil {
                 expire(key, time);
             return count;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
@@ -414,7 +417,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForSet().size(key);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
@@ -432,7 +435,7 @@ public class RedisUtil {
             Long count = redisTemplate.opsForSet().remove(key, values);
             return count;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
@@ -454,7 +457,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForList().range(key, start, end);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return null;
         }
     }
@@ -470,7 +473,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForList().size(key);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
@@ -487,7 +490,7 @@ public class RedisUtil {
         try {
             return redisTemplate.opsForList().index(key, index);
         } catch (Exception e) {
-            e.printStackTrace();
+
             return null;
         }
     }
@@ -504,7 +507,7 @@ public class RedisUtil {
             redisTemplate.opsForList().rightPush(key, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -524,7 +527,7 @@ public class RedisUtil {
                 expire(key, time);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -541,7 +544,7 @@ public class RedisUtil {
             redisTemplate.opsForList().rightPushAll(key, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -561,7 +564,7 @@ public class RedisUtil {
                 expire(key, time);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -579,7 +582,7 @@ public class RedisUtil {
             redisTemplate.opsForList().set(key, index, value);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -597,7 +600,7 @@ public class RedisUtil {
             Long remove = redisTemplate.opsForList().remove(key, count, value);
             return remove;
         } catch (Exception e) {
-            e.printStackTrace();
+
             return 0;
         }
     }
