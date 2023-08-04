@@ -32,7 +32,7 @@ public class MyInterceptor implements HandlerInterceptor {
      */
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, @NonNull Object handler) {
         response.setHeader("Access-Control-Allow-Origin", request.getHeader("*"));
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("P3P", "CP=CAO PSA OUR");

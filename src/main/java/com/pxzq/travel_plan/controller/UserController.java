@@ -98,6 +98,7 @@ public class UserController {
         redisUtil.set(userName, token, 604800);
         return R.success("注册成功!", token);
     }
+
     /**
      * logout
      *
